@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LANAUTICA Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#0a0f1a;--bg2:#111827;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--border-h:rgba(255,255,255,0.15);--text:#e8ecf1;--muted:rgba(255,255,255,0.45);--accent:#4ea8de;--accent2:#7ec8e3;--red:#f87171;--red-bg:rgba(248,113,113,0.1);--green:#34d399;--green-bg:rgba(52,211,153,0.1);--yellow:#fbbf24;--yellow-bg:rgba(251,191,36,0.1);--radius:14px;--radius-sm:10px}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+    .login-gate{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+    .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px;width:100%;max-width:380px;text-align:center}
+    .login-box h1{font-size:1.3rem;font-weight:700;color:var(--accent2);margin-bottom:4px}
+    .login-box p{font-size:.78rem;color:var(--muted);margin-bottom:24px}
+    .login-input{width:100%;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:.9rem;outline:none;transition:border .3s}
+    .login-input:focus{border-color:var(--accent)}
+    .login-btn{width:100%;margin-top:14px;padding:12px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .3s}
+    .login-btn:hover{opacity:.85}
+    .login-error{color:var(--red);font-size:.78rem;margin-top:10px;min-height:20px}
+    .admin{display:none;padding:20px;max-width:960px;margin:0 auto}
+    .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .admin-title{font-size:1.2rem;font-weight:700}
+    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .admin-tabs{display:flex;gap:4px;background:var(--card);padding:4px;border-radius:var(--radius-sm);border:1px solid var(--border);width:fit-content}
+    .admin-tab{padding:8px 20px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .25s}
+    .admin-tab.active{background:var(--accent);color:var(--bg);font-weight:600}
+    .admin-tab:not(.active):hover{color:var(--text);background:rgba(255,255,255,.04)}
+    .tab-content{display:none}.tab-content.active{display:block}
+    .btn-sm{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:6px}
+    .btn-sm:hover{border-color:var(--border-h);background:rgba(255,255,255,.06)}
+    .btn-sm.danger{color:var(--red);border-color:rgba(248,113,113,.2)}.btn-sm.danger:hover{background:var(--red-bg);border-color:rgba(248,113,113,.35)}
+    .btn-sm.primary{color:var(--accent2);border-color:rgba(78,168,222,.2)}.btn-sm.primary:hover{background:rgba(78,168,222,.1);border-color:rgba(78,168,222,.35)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+    .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center}
+    .stat-val{font-size:1.4rem;font-weight:700;line-height:1.2}
+    .stat-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+    .stat.s-teater .stat-val{color:var(--accent2)}.stat.s-event .stat-val{color:var(--yellow)}.stat.s-digital .stat-val{color:var(--green)}
+    .stat.s-lana .stat-val{color:var(--accent2)}.stat.s-lanautica .stat-val{color:var(--green)}
+    .form-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+    .form-section h2{font-size:.95rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .form-section h2 svg{width:18px;height:18px;stroke:var(--accent2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-group{display:flex;flex-direction:column;gap:5px}
+    .form-group.full{grid-column:1/-1}
+    .form-label{font-size:.72rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+    .form-input,.form-select,.form-textarea{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:.84rem;outline:none;transition:border .3s}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+    .form-select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+    .form-select option{background:var(--bg2);color:var(--text)}
+    .form-row{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
+    .form-row .btn-submit{padding:10px 24px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .3s}
+    .form-row .btn-submit:hover{opacity:.85}.form-row .btn-submit:disabled{opacity:.4;cursor:not-allowed}
+    .quick-toggle{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--muted);cursor:pointer;user-select:none}
+    .quick-toggle input{accent-color:var(--accent)}
+    .table-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+    .table-header h2{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:8px}
+    .table-header h2 svg{width:18px;height:18px;stroke:var(--accent2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .search-box{padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit;font-size:.8rem;outline:none;width:200px;transition:border .3s}
+    .search-box:focus{border-color:var(--accent)}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    .gal-table{min-width:700px}
+    .jadwal-table{min-width:640px}
+    thead{background:rgba(78,168,222,.06)}
+    th{padding:11px 16px;font-size:.65rem;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.8px;text-align:left;white-space:nowrap}
+    th:last-child{text-align:center}
+    td{padding:10px 16px;font-size:.82rem;border-top:1px solid rgba(255,255,255,.03);white-space:nowrap}
+    tr:hover td{background:rgba(255,255,255,.02)}
+    .type-badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.62rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+    .type-badge.teater{background:rgba(78,168,222,.12);border:1px solid rgba(78,168,222,.25);color:var(--accent2)}
+    .type-badge.event{background:var(--yellow-bg);border:1px solid rgba(251,191,36,.25);color:var(--yellow)}
+    .type-badge.digital{background:var(--green-bg);border:1px solid rgba(52,211,153,.25);color:var(--green)}
+    .folder-badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.62rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+    .folder-badge.lana{background:rgba(78,168,222,.12);border:1px solid rgba(78,168,222,.25);color:var(--accent2)}
+    .folder-badge.lanautica{background:var(--green-bg);border:1px solid rgba(94,234,212,.25);color:var(--green)}
+    .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+    .status-dot.upcoming{background:var(--accent)}.status-dot.done{background:rgba(255,255,255,.15)}
+    .table-actions{display:flex;gap:6px;justify-content:center}
+    .tbl-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .tbl-btn:hover{border-color:var(--border-h);color:var(--text);background:rgba(255,255,255,.06)}
+    .tbl-btn.del:hover{border-color:rgba(248,113,113,.3);color:var(--red);background:var(--red-bg)}
+    .tbl-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .group-header td{background:rgba(78,168,222,.04);font-weight:600;font-size:.8rem;color:var(--accent2);padding:8px 16px}
+    .group-header .gc{font-weight:400;color:var(--muted);font-size:.72rem;margin-left:6px}
+    .empty-row td{text-align:center;padding:40px 20px;color:var(--muted);font-size:.84rem}
+    .src-cell{max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:.76rem;color:var(--muted)}
+    .thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid var(--border);vertical-align:middle;margin-right:8px}
+    .modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .modal-overlay.active{opacity:1;pointer-events:auto}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .3s}
+    .modal-overlay.active .modal{transform:translateY(0)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+    .modal-head h3{font-size:1rem;font-weight:600}
+    .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
+    .modal-close:hover{color:var(--text);border-color:var(--border-h)}
+    .modal-body{padding:24px}
+    .modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:1px solid var(--border)}
+    .modal-foot .btn-cancel{padding:10px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;font-size:.84rem;cursor:pointer}
+    .modal-foot .btn-cancel:hover{border-color:var(--border-h)}
+    .modal-foot .btn-confirm{padding:10px 20px;border-radius:var(--radius-sm);border:none;background:var(--red);color:#fff;font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+    .modal-foot .btn-confirm:hover{opacity:.85}
+    .modal-foot .btn-save{padding:10px 20px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:var(--bg);font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+    .modal-foot .btn-save:hover{opacity:.85}
+    .toast-container{position:fixed;top:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+    .toast{padding:12px 20px;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500;transform:translateX(120%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:340px;border:1px solid}
+    .toast.show{transform:translateX(0)}
+    .toast.success{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.25);color:var(--green)}
+    .toast.error{background:var(--red-bg);border-color:rgba(248,113,113,.25);color:var(--red)}
+    .spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:10px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.admin-header{flex-direction:column;align-items:flex-start}.search-box{width:100%}.table-header{flex-direction:column;align-items:flex-start}.admin-tabs{width:100%}.admin-tab{flex:1;text-align:center}}
+  </style>
+</head>
+<body>
+
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <h1>LANAUTICA</h1>
+    <p>Admin Panel</p>
+    <input type="password" class="login-input" id="loginPass" placeholder="Masukkan password" autocomplete="off">
+    <button class="login-btn" id="loginBtn">Masuk</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div class="admin" id="adminPanel">
+  <div class="admin-header">
+    <div class="admin-title">LANAUTICA Admin</div>
+    <div class="admin-actions">
+      <button class="btn-sm primary" onclick="importAll()" id="importBtn">Import Semua Data</button>
+      <button class="btn-sm" onclick="refreshAll()">Refresh</button>
+      <button class="btn-sm danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchTab('jadwal')">Jadwal</button>
+    <button class="admin-tab" onclick="switchTab('galeri')">Galeri</button>
+  </div>
+
+  <!-- ===== TAB: JADWAL ===== -->
+  <div class="tab-content active" id="tabJadwal">
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total</div></div>
+      <div class="stat s-teater"><div class="stat-val" id="statTeater">0</div><div class="stat-lbl">Teater</div></div>
+      <div class="stat s-event"><div class="stat-val" id="statEvent">0</div><div class="stat-lbl">Event</div></div>
+      <div class="stat s-digital"><div class="stat-val" id="statDigital">0</div><div class="stat-lbl">Digital</div></div>
+    </div>
+    <div class="form-section">
+      <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tambah Jadwal</h2>
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Nama Kegiatan</label><input type="text" class="form-input" id="fNama" placeholder="cth: Teater Show"></div>
+        <div class="form-group"><label class="form-label">Tipe</label><select class="form-select" id="fTipe"><option value="teater">Teater</option><option value="event">Event</option><option value="digital">Digital</option></select></div>
+        <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="fTanggal"></div>
+        <div class="form-group"><label class="form-label">Jam</label><input type="time" class="form-input" id="fJam" value="14:00"></div>
+        <div class="form-group full"><label class="form-label">Deskripsi</label><input type="text" class="form-input" id="fDesc" placeholder="cth: Pertunjukan teater rutin"></div>
+      </div>
+      <div class="form-row">
+        <button class="btn-submit" id="addJBtn" onclick="addJadwal()">Tambah</button>
+        <label class="quick-toggle"><input type="checkbox" id="quickJ" checked>Quick Add</label>
+        <button class="btn-sm" onclick="resetJForm()" style="margin-left:auto">Reset</button>
+      </div>
+    </div>
+    <div class="table-section">
+      <div class="table-header">
+        <h2><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Data Jadwal</h2>
+        <input type="text" class="search-box" id="searchJ" placeholder="Cari..." oninput="renderJadwalTable()">
+      </div>
+      <div class="table-wrap"><table class="jadwal-table"><thead><tr><th>No</th><th>Kegiatan</th><th>Tipe</th><th>Tanggal</th><th>Jam</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="jadwalBody"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: GALERI ===== -->
+  <div class="tab-content" id="tabGaleri">
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="gStatTotal">0</div><div class="stat-lbl">Total Foto</div></div>
+      <div class="stat s-lana"><div class="stat-val" id="gStatLana">0</div><div class="stat-lbl">Lana</div></div>
+      <div class="stat s-lanautica"><div class="stat-val" id="gStatLanautica">0</div><div class="stat-lbl">LANAUTICA</div></div>
+      <div class="stat"><div class="stat-val" id="gStatAlbum">0</div><div class="stat-lbl">Album</div></div>
+    </div>
+    <div class="form-section">
+      <h2><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Tambah Foto</h2>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Folder</label><select class="form-select" id="gFolder"><option value="lana">Lana</option><option value="lanautica">LANAUTICA</option></select></div>
+        <div class="form-group"><label class="form-label">Album Key</label><input type="text" class="form-input" id="gAlbum" placeholder="cth: sportstive"></div>
+        <div class="form-group"><label class="form-label">Label (Nama Tampilan)</label><input type="text" class="form-input" id="gLabel" placeholder="cth: Sportstive+ 11/04/2026"></div>
+        <div class="form-group"><label class="form-label">Alt Text</label><input type="text" class="form-input" id="gAlt" placeholder="cth: Sportstive+"></div>
+        <div class="form-group full"><label class="form-label">Path Foto (src)</label><input type="text" class="form-input" id="gSrc" placeholder="cth: Lana/lanautica 2/Sportstive+/c.jpeg"></div>
+      </div>
+      <div class="form-row">
+        <button class="btn-submit" id="addGBtn" onclick="addGaleri()">Tambah</button>
+        <label class="quick-toggle"><input type="checkbox" id="quickG" checked>Quick Add (folder/album/label tetap)</label>
+        <button class="btn-sm" onclick="resetGForm()" style="margin-left:auto">Reset</button>
+      </div>
+    </div>
+    <div class="table-section">
+      <div class="table-header">
+        <h2><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Data Galeri</h2>
+        <input type="text" class="search-box" id="searchG" placeholder="Cari album..." oninput="renderGaleriTable()">
+      </div>
+      <div class="table-wrap"><table class="gal-table"><thead><tr><th>No</th><th>Preview</th><th>Album</th><th>Folder</th><th>Path</th><th>Aksi</th></tr></thead><tbody id="galeriBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit Jadwal -->
+<div class="modal-overlay" id="editJModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Edit Jadwal</h3><button class="modal-close" onclick="closeModal('editJModal')">&times;</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group full"><label class="form-label">Nama</label><input type="text" class="form-input" id="eNama"></div>
+      <div class="form-group"><label class="form-label">Tipe</label><select class="form-select" id="eTipe"><option value="teater">Teater</option><option value="event">Event</option><option value="digital">Digital</option></select></div>
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="eTanggal"></div>
+      <div class="form-group"><label class="form-label">Jam</label><input type="time" class="form-input" id="eJam"></div>
+      <div class="form-group full"><label class="form-label">Deskripsi</label><input type="text" class="form-input" id="eDesc"></div>
+    </div></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeModal('editJModal')">Batal</button><button class="btn-save" onclick="saveEditJ()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Edit Galeri -->
+<div class="modal-overlay" id="editGModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Edit Foto</h3><button class="modal-close" onclick="closeModal('editGModal')">&times;</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label class="form-label">Folder</label><select class="form-select" id="egFolder"><option value="lana">Lana</option><option value="lanautica">LANAUTICA</option></select></div>
+      <div class="form-group"><label class="form-label">Album Key</label><input type="text" class="form-input" id="egAlbum"></div>
+      <div class="form-group"><label class="form-label">Label</label><input type="text" class="form-input" id="egLabel"></div>
+      <div class="form-group"><label class="form-label">Alt Text</label><input type="text" class="form-input" id="egAlt"></div>
+      <div class="form-group full"><label class="form-label">Path Foto</label><input type="text" class="form-input" id="egSrc"></div>
+    </div></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeModal('editGModal')">Batal</button><button class="btn-save" onclick="saveEditG()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Delete -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head"><h3>Hapus</h3><button class="modal-close" onclick="closeModal('deleteModal')">&times;</button></div>
+    <div class="modal-body"><p id="deleteMsg" style="font-size:.88rem;color:var(--muted);line-height:1.6"></p></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeModal('deleteModal')">Batal</button><button class="btn-confirm" id="deleteConfirmBtn">Hapus</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastBox"></div>
+
+<script>
+var API_URL='https://script.google.com/macros/s/AKfycbw9ZljQTB3yZbIiifk2SVgpWxeVdDPQLQ0I6lNnWbR3PUVdib1Wa6syuGLMldZ46nYvmA/exec';
+var ADMIN_PASSWORD='lanautica2026';
+
+var INITIAL_JADWAL=[
+  {nama:"Teater Show",tipe:"teater",deskripsi:"Pertunjukan teater rutin JKT48 di Theater FX Sudirman",tanggal:"11 April 2025",jam:"14:00 WIB"},
+  {nama:"Teater Show",tipe:"teater",deskripsi:"Pertunjukan teater rutin JKT48 di Theater FX Sudirman",tanggal:"25 April 2025",jam:"14:00 WIB"},
+  {nama:"Teater Show",tipe:"teater",deskripsi:"Pertunjukan teater rutin JKT48 di Theater FX Sudirman",tanggal:"9 Mei 2025",jam:"14:00 WIB"},
+  {nama:"Teater Show",tipe:"teater",deskripsi:"Pertunjukan teater rutin JKT48 di Theater FX Sudirman",tanggal:"23 Mei 2026",jam:"14:00 WIB"},
+  {nama:"Teater Show",tipe:"teater",deskripsi:"Pertunjukan teater rutin JKT48 di Theater FX Sudirman",tanggal:"20 Agustus 2026",jam:"19:00 WIB"},
+  {nama:"Setlist Pajama",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Pajama Drive",tanggal:"8 Juni 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Pajama",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Pajama Drive",tanggal:"22 Juni 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Pajama",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Pajama Drive",tanggal:"6 Juli 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Pajama",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Pajama Drive",tanggal:"20 Juli 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Pajama",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Pajama Drive",tanggal:"3 Agustus 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Aitakatta",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Aitakatta",tanggal:"17 Agustus 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Aitakatta",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Aitakatta",tanggal:"31 Agustus 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Aitakatta",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Aitakatta",tanggal:"14 September 2025",jam:"14:00 WIB"},
+  {nama:"Setlist Aitakatta",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist Aitakatta",tanggal:"28 September 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"12 Oktober 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"26 Oktober 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"9 November 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"23 November 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"7 Desember 2025",jam:"14:00 WIB"},
+  {nama:"Setlist KKGirls",tipe:"teater",deskripsi:"Pertunjukan teater dengan setlist KKGirls",tanggal:"8 Januari 2026",jam:"14:00 WIB"},
+  {nama:"OFC Event",tipe:"event",deskripsi:"Acara eksklusif Official Fan Club JKT48",tanggal:"10 Juni 2025",jam:"10:00 WIB"},
+  {nama:"OFC Event",tipe:"event",deskripsi:"Acara eksklusif Official Fan Club JKT48",tanggal:"15 November 2025",jam:"10:00 WIB"},
+  {nama:"Video Call",tipe:"digital",deskripsi:"Sesi video call bersama Lana",tanggal:"5 Juli 2025",jam:"15:00 WIB"},
+  {nama:"Video Call",tipe:"digital",deskripsi:"Sesi video call bersama Lana",tanggal:"20 Desember 2025",jam:"15:00 WIB"}
+];
+
+var INITIAL_GALERI=[
+  {folder:'lana',album:'sportstive',label:'Sportstive+ 11/04/2026',src:'Lana/lanautica 2/Sportstive+ 11-04-2026/c.jpeg',alt:'Sportstive+'},
+  {folder:'lana',album:'swara',label:'Swara Semesta - 01/02/2026',src:'Lana/Lanautica/Swara Semesta - 01-02-2026/f (1).jpg',alt:'Swara'},
+  {folder:'lana',album:'swara',label:'Swara Semesta - 01/02/2026',src:'Lana/Lanautica/Swara Semesta - 01-02-2026/f (2).jpg',alt:'Swara'},
+  {folder:'lana',album:'pictiktok',label:'Profile Picture Tiktok Lana',src:'Lana/Lanautica/Profile Pict Tiktok Lana/r (1).jpg',alt:'tiktok'},
+  {folder:'lana',album:'pictiktok',label:'Profile Picture Tiktok Lana',src:'Lana/Lanautica/Profile Pict Tiktok Lana/r (2).jpg',alt:'tiktok'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (1).jpg',alt:'s'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (2).jpg',alt:'s'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (3).jpg',alt:'s'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (4).jpg',alt:'s'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (5).jpg',alt:'s'},
+  {folder:'lanautica',album:'sister',label:'Sister Reunion - JKT48 & AKB48 Personal M&G',src:'Lana/Lanautica/SISTER REUNION - JKT48 & AKB48 Personal M&G/e (6).jpg',alt:'s'},
+  {folder:'lanautica',album:'sts',label:'STS Lana, Hikar18rightLana',src:'Lana/Lanautica/STS Lana, Hikar18rightLana/r (1).jpg',alt:'s'},
+  {folder:'lanautica',album:'sts',label:'STS Lana, Hikar18rightLana',src:'Lana/Lanautica/STS Lana, Hikar18rightLana/r (2).jpg',alt:'s'},
+  {folder:'lanautica',album:'sts',label:'STS Lana, Hikar18rightLana',src:'Lana/Lanautica/STS Lana, Hikar18rightLana/r (3).jpg',alt:'s'},
+  {folder:'lanautica',album:'sts',label:'STS Lana, Hikar18rightLana',src:'Lana/Lanautica/STS Lana, Hikar18rightLana/r (4).jpg',alt:'s'}
+];
+
+var jadwalData=[], galeriData=[], editingJId=null, editingGId=null;
+var BULAN_ID=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+/* ===== LOGIN ===== */
+document.getElementById('loginBtn').addEventListener('click',doLogin);
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+function doLogin(){
+  if(document.getElementById('loginPass').value===ADMIN_PASSWORD){
+    sessionStorage.setItem('la_auth','1');
+    document.getElementById('loginGate').style.display='none';
+    document.getElementById('adminPanel').style.display='block';
+    refreshAll();
+  }else{document.getElementById('loginError').textContent='Password salah!';}
+}
+function logout(){
+  sessionStorage.removeItem('la_auth');
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('loginGate').style.display='flex';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginError').textContent='';
+}
+if(sessionStorage.getItem('la_auth')==='1'){document.getElementById('loginGate').style.display='none';document.getElementById('adminPanel').style.display='block';refreshAll();}
+
+/* ===== TABS ===== */
+function switchTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(function(t,i){t.classList.toggle('active',i===(tab==='jadwal'?0:1));});
+  document.getElementById('tabJadwal').classList.toggle('active',tab==='jadwal');
+  document.getElementById('tabGaleri').classList.toggle('active',tab==='galeri');
+}
+
+/* ===== API ===== */
+function apiGet(action){return fetch(API_URL+'?action='+action+'&t='+Date.now()).then(function(r){return r.json();});}
+function apiPost(data){return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(data)}).then(function(r){return r.json();});}
+
+/* ===== DATE ===== */
+function toIDDate(s){var p=s.split('-');return parseInt(p[2],10)+' '+BULAN_ID[parseInt(p[1],10)-1]+' '+p[0];}
+function fromIDDate(s){var M={januari:'01',februari:'02',maret:'03',april:'04',mei:'05',juni:'06',juli:'07',agustus:'08',september:'09',oktober:'10',november:'11',desember:'12'};var p=s.toLowerCase().replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/);if(p.length<3)return'';return p[2]+'-'+(M[p[1]]||'01')+'-'+p[0].padStart(2,'0');}
+function extractTime(s){return(s||'').split(' ')[0];}
+function isFuture(s){var M={januari:0,februari:1,maret:2,april:3,mei:4,juni:5,juli:6,agustus:7,september:8,oktober:9,november:10,desember:11};var p=s.toLowerCase().replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/);if(p.length<3)return false;var d=parseInt(p[0],10),m=M[p[1]],y=parseInt(p[2],10);if(isNaN(d)||isNaN(m)||isNaN(y))return false;return new Date(y,m,d).getTime()>=new Date(new Date().setHours(0,0,0,0)).getTime();}
+
+/* ===== REFRESH ===== */
+function refreshAll(){refreshJadwal();refreshGaleri();}
+
+/* ============================
+   JADWAL
+   ============================ */
+function refreshJadwal(){
+  document.getElementById('jadwalBody').innerHTML='<tr class="empty-row"><td colspan="7"><div class="spinner"></div><br>Memuat...</td></tr>';
+  apiGet('read').then(function(d){jadwalData=d;renderJStats();renderJadwalTable();}).catch(function(e){document.getElementById('jadwalBody').innerHTML='<tr class="empty-row"><td colspan="7" style="color:var(--red)">Gagal memuat</td></tr>';});
+}
+function renderJStats(){
+  var t=0,te=0,ev=0,di=0;jadwalData.forEach(function(r){t++;if(r.tipe==='teater')te++;else if(r.tipe==='event')ev++;else di++;});
+  document.getElementById('statTotal').textContent=t;document.getElementById('statTeater').textContent=te;
+  document.getElementById('statEvent').textContent=ev;document.getElementById('statDigital').textContent=di;
+}
+function renderJadwalTable(){
+  var s=(document.getElementById('searchJ').value||'').toLowerCase();
+  var f=jadwalData.filter(function(r){return!s||r.nama.toLowerCase().indexOf(s)!==-1;});
+  f.sort(function(a,b){if(a.nama<b.nama)return-1;if(a.nama>b.nama)return 1;return a.tanggal.localeCompare(b.tanggal);});
+  if(!f.length){document.getElementById('jadwalBody').innerHTML='<tr class="empty-row"><td colspan="7">'+(s?'Tidak ditemukan':'Belum ada data')+'</td></tr>';return;}
+  var h='',cg='',no=0;
+  f.forEach(function(r){
+    if(r.nama!==cg){var gc=f.filter(function(x){return x.nama===r.nama;}).length;if(cg)h+='<tr class="group-header"><td colspan="7" style="height:6px;padding:0"></td></tr>';h+='<tr class="group-header"><td colspan="7">'+r.nama+'<span class="gc">'+gc+' jadwal</span><button class="tbl-btn del" style="float:right;margin-left:12px" onclick="deleteGroupJ(\''+r.nama.replace(/'/g,"\\'")+'\')" title="Hapus semua"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>';cg=r.nama;}
+    no++;var ft=isFuture(r.tanggal);
+    h+='<tr><td style="color:var(--muted)">'+no+'</td><td style="font-weight:500">'+r.nama+'</td><td><span class="type-badge '+r.tipe+'">'+r.tipe+'</span></td><td>'+r.tanggal+'</td><td>'+r.jam+'</td><td><span class="status-dot '+(ft?'upcoming':'done')+'"></span>'+(ft?'Mendatang':'Selesai')+'</td><td><div class="table-actions"><button class="tbl-btn" onclick="openEditJ(\''+r.id+'\')" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="tbl-btn del" onclick="openDelete(\''+r.id+'\',\''+r.tanggal+'\')" title="Hapus"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div></td></tr>';
+  });
+  document.getElementById('jadwalBody').innerHTML=h;
+}
+function addJadwal(){
+  var n=document.getElementById('fNama').value.trim(),t=document.getElementById('fTipe').value,d=document.getElementById('fTanggal').value,j=document.getElementById('fJam').value,ds=document.getElementById('fDesc').value.trim();
+  if(!n||!d||!j){toast('Nama, tanggal, jam wajib diisi','error');return;}
+  var btn=document.getElementById('addJBtn');btn.disabled=true;btn.textContent='Menyimpan...';
+  apiPost({action:'add',nama:n,tipe:t,deskripsi:ds,tanggal:toIDDate(d),jam:j+' WIB'}).then(function(r){
+    if(r.success){toast('Ditambahkan: '+toIDDate(d),'success');if(document.getElementById('quickJ').checked)document.getElementById('fTanggal').value='';else resetJForm();refreshJadwal();}
+    else toast('Gagal','error');
+  }).catch(function(e){toast('Gagal: '+e.message,'error');}).finally(function(){btn.disabled=false;btn.textContent='Tambah';});
+}
+function resetJForm(){document.getElementById('fNama').value='';document.getElementById('fTipe').value='teater';document.getElementById('fTanggal').value='';document.getElementById('fJam').value='14:00';document.getElementById('fDesc').value='';}
+function openEditJ(id){var r=jadwalData.find(function(x){return x.id===id;});if(!r)return;editingJId=id;document.getElementById('eNama').value=r.nama;document.getElementById('eTipe').value=r.tipe;document.getElementById('eTanggal').value=fromIDDate(r.tanggal);document.getElementById('eJam').value=extractTime(r.jam);document.getElementById('eDesc').value=r.deskripsi||'';openModal('editJModal');}
+function saveEditJ(){
+  var n=document.getElementById('eNama').value.trim(),t=document.getElementById('eTipe').value,d=document.getElementById('eTanggal').value,j=document.getElementById('eJam').value,ds=document.getElementById('eDesc').value.trim();
+  if(!n||!d||!j){toast('Semua field wajib','error');return;}
+  apiPost({action:'edit',id:editingJId,nama:n,tipe:t,deskripsi:ds,tanggal:toIDDate(d),jam:j+' WIB'}).then(function(r){if(r.success){toast('Jadwal diupdate','success');closeModal('editJModal');refreshJadwal();}else toast('Gagal','error');}).catch(function(e){toast('Gagal: '+e.message,'error');});
+}
+function openDelete(id,txt){document.getElementById('deleteMsg').innerHTML='Hapus <strong style="color:var(--text)">'+txt+'</strong>?';document.getElementById('deleteConfirmBtn').onclick=function(){apiPost({action:'delete',id:id}).then(function(r){if(r.success){toast('Dihapus','success');closeModal('deleteModal');refreshJadwal();}else toast('Gagal','error');}).catch(function(e){toast('Gagal','error');});};openModal('deleteModal');}
+function deleteGroupJ(nama){var c=jadwalData.filter(function(r){return r.nama===nama;}).length;document.getElementById('deleteMsg').innerHTML='Hapus <strong style="color:var(--red)">'+c+' jadwal</strong> "<strong style="color:var(--text)">'+nama+'</strong>"?';document.getElementById('deleteConfirmBtn').onclick=function(){apiPost({action:'deleteGroup',nama:nama}).then(function(r){if(r.success){toast(r.deleted+' jadwal dihapus','success');closeModal('deleteModal');refreshJadwal();}else toast('Gagal','error');}).catch(function(e){toast('Gagal','error');});};openModal('deleteModal');}
+
+/* ============================
+   GALERI
+   ============================ */
+function refreshGaleri(){
+  document.getElementById('galeriBody').innerHTML='<tr class="empty-row"><td colspan="6"><div class="spinner"></div><br>Memuat...</td></tr>';
+  apiGet('readGallery').then(function(d){galeriData=d;renderGStats();renderGaleriTable();}).catch(function(e){document.getElementById('galeriBody').innerHTML='<tr class="empty-row"><td colspan="6" style="color:var(--red)">Gagal memuat</td></tr>';});
+}
+function renderGStats(){
+  var t=0,la=0,ln=0,albums={};
+  galeriData.forEach(function(r){t++;if(r.folder==='lana')la++;else ln++;albums[r.folder+'|'+r.album]=1;});
+  document.getElementById('gStatTotal').textContent=t;document.getElementById('gStatLana').textContent=la;
+  document.getElementById('gStatLanautica').textContent=ln;document.getElementById('gStatAlbum').textContent=Object.keys(albums).length;
+}
+function renderGaleriTable(){
+  var s=(document.getElementById('searchG').value||'').toLowerCase();
+  var f=galeriData.filter(function(r){return!s||(r.label||'').toLowerCase().indexOf(s)!==-1||(r.album||'').toLowerCase().indexOf(s)!==-1;});
+  f.sort(function(a,b){var ka=a.folder+'|'+a.album,kb=b.folder+'|'+b.album;if(ka<kb)return-1;if(ka>kb)return 1;return 0;});
+  if(!f.length){document.getElementById('galeriBody').innerHTML='<tr class="empty-row"><td colspan="6">'+(s?'Tidak ditemukan':'Belum ada data')+'</td></tr>';return;}
+  var h='',ck='',no=0;
+  f.forEach(function(r){
+    var key=r.folder+'|'+r.album;
+    if(key!==ck){var gc=f.filter(function(x){return x.folder+'|'+x.album===key;}).length;if(ck)h+='<tr class="group-header"><td colspan="6" style="height:6px;padding:0"></td></tr>';h+='<tr class="group-header"><td colspan="6"><span class="folder-badge '+r.folder+'">'+r.folder+'</span> '+r.label+'<span class="gc">'+gc+' foto</span><button class="tbl-btn del" style="float:right;margin-left:12px" onclick="deleteGroupG(\''+r.folder+'\',\''+r.album.replace(/'/g,"\\'")+'\')" title="Hapus album"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>';ck=key;}
+    no++;
+    h+='<tr><td style="color:var(--muted)">'+no+'</td><td><img class="thumb" src="'+r.src+'" onerror="this.style.display=\'none\'"></td><td style="font-weight:500">'+r.label+'</td><td><span class="folder-badge '+r.folder+'">'+r.folder+'</span></td><td class="src-cell" title="'+r.src+'">'+r.src+'</td><td><div class="table-actions"><button class="tbl-btn" onclick="openEditG(\''+r.id+'\')" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="tbl-btn del" onclick="openDeleteG(\''+r.id+'\')" title="Hapus"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div></td></tr>';
+  });
+  document.getElementById('galeriBody').innerHTML=h;
+}
+function addGaleri(){
+  var fo=document.getElementById('gFolder').value,al=document.getElementById('gAlbum').value.trim(),la=document.getElementById('gLabel').value.trim(),sr=document.getElementById('gSrc').value.trim(),at=document.getElementById('gAlt').value.trim();
+  if(!al||!sr){toast('Album key dan path wajib diisi','error');return;}
+  var btn=document.getElementById('addGBtn');btn.disabled=true;btn.textContent='Menyimpan...';
+  apiPost({action:'addGallery',folder:fo,album:al,label:la,src:sr,alt:at}).then(function(r){
+    if(r.success){toast('Foto ditambahkan','success');if(document.getElementById('quickG').checked){document.getElementById('gSrc').value='';document.getElementById('gAlt').value='';}else resetGForm();refreshGaleri();}
+    else toast('Gagal','error');
+  }).catch(function(e){toast('Gagal: '+e.message,'error');}).finally(function(){btn.disabled=false;btn.textContent='Tambah';});
+}
+function resetGForm(){document.getElementById('gFolder').value='lana';document.getElementById('gAlbum').value='';document.getElementById('gLabel').value='';document.getElementById('gSrc').value='';document.getElementById('gAlt').value='';}
+function openEditG(id){var r=galeriData.find(function(x){return x.id===id;});if(!r)return;editingGId=id;document.getElementById('egFolder').value=r.folder;document.getElementById('egAlbum').value=r.album;document.getElementById('egLabel').value=r.label||'';document.getElementById('egSrc').value=r.src;document.getElementById('egAlt').value=r.alt||'';openModal('editGModal');}
+function saveEditG(){
+  var fo=document.getElementById('egFolder').value,al=document.getElementById('egAlbum').value.trim(),la=document.getElementById('egLabel').value.trim(),sr=document.getElementById('egSrc').value.trim(),at=document.getElementById('egAlt').value.trim();
+  if(!al||!sr){toast('Album key dan path wajib','error');return;}
+  apiPost({action:'editGallery',id:editingGId,folder:fo,album:al,label:la,src:sr,alt:at}).then(function(r){if(r.success){toast('Foto diupdate','success');closeModal('editGModal');refreshGaleri();}else toast('Gagal','error');}).catch(function(e){toast('Gagal: '+e.message,'error');});
+}
+function openDeleteG(id){var r=galeriData.find(function(x){return x.id===id;});document.getElementById('deleteMsg').innerHTML='Hapus foto "<strong style="color:var(--text)">'+(r?r.src:'')+'</strong>"?';document.getElementById('deleteConfirmBtn').onclick=function(){apiPost({action:'deleteGallery',id:id}).then(function(r){if(r.success){toast('Dihapus','success');closeModal('deleteModal');refreshGaleri();}else toast('Gagal','error');}).catch(function(e){toast('Gagal','error');});};openModal('deleteModal');}
+function deleteGroupG(folder,album){var c=galeriData.filter(function(r){return r.folder===folder&&r.album===album;}).length;document.getElementById('deleteMsg').innerHTML='Hapus <strong style="color:var(--red)">'+c+' foto</strong> dari album "<strong style="color:var(--text)">'+album+'</strong>"?';document.getElementById('deleteConfirmBtn').onclick=function(){apiPost({action:'deleteGalleryGroup',folder:folder,album:album}).then(function(r){if(r.success){toast(r.deleted+' foto dihapus','success');closeModal('deleteModal');refreshGaleri();}else toast('Gagal','error');}).catch(function(e){toast('Gagal','error');});};openModal('deleteModal');}
+
+/* ===== IMPORT ===== */
+function importAll(){
+  var jCount=jadwalData.length, gCount=galeriData.length;
+  var msg='Import akan menambahkan <strong style="color:var(--accent2)">'+INITIAL_JADWAL.length+' jadwal</strong> dan <strong style="color:var(--accent2)">'+INITIAL_GALERI.length+' foto</strong>';
+  if(jCount>0||gCount>0) msg+='<br><span style="font-size:.76rem;color:var(--muted)">Saat ini: '+jCount+' jadwal, '+gCount+' foto (data baru ditambahkan, tidak mengganti)</span>';
+  document.getElementById('deleteMsg').innerHTML=msg;
+  document.getElementById('deleteConfirmBtn').textContent='Import';
+  document.getElementById('deleteConfirmBtn').className='btn-save';
+  document.getElementById('deleteConfirmBtn').onclick=function(){
+    closeModal('deleteModal');
+    document.getElementById('deleteConfirmBtn').textContent='Hapus';
+    document.getElementById('deleteConfirmBtn').className='btn-confirm';
+    var btn=document.getElementById('importBtn');btn.disabled=true;btn.textContent='Mengimport...';
+    Promise.all([apiPost({action:'batchAdd',items:INITIAL_JADWAL}),apiPost({action:'batchAddGallery',items:INITIAL_GALERI})]).then(function(res){
+      var total=res[0].count+res[1].count;
+      toast(total+' data berhasil diimport!','success');refreshAll();
+    }).catch(function(e){toast('Gagal: '+e.message,'error');}).finally(function(){btn.disabled=false;btn.textContent='Import Semua Data';});
+  };
+  openModal('deleteModal');
+}
+
+/* ===== MODAL ===== */
+function openModal(id){document.getElementById(id).classList.add('active');}
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+document.querySelectorAll('.modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('active');});});
+
+/* ===== TOAST ===== */
+function toast(msg,type){var t=document.createElement('div');t.className='toast '+(type||'info');t.textContent=msg;document.getElementById('toastBox').appendChild(t);setTimeout(function(){t.classList.add('show');},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},350);},3500);}
+</script>
+</body>
+</html>
